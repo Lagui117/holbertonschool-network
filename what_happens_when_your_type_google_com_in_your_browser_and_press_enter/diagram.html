@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Request Flow Diagram</title>
+  <style>
+    :root {
+      --bg: #050a12;
+      --panel: #0b1422;
+      --text: #e9f1ff;
+      --muted: #90a8c7;
+      --line: #8eb8ff;
+      --line-soft: #4d6f9f;
+      --browser: #3b82f6;
+      --dns: #0ea5e9;
+      --tcp: #22c55e;
+      --tls: #f59e0b;
+      --firewall: #ef4444;
+      --lb: #a855f7;
+      --web: #14b8a6;
+      --app: #f97316;
+      --db: #10b981;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 0%, #11223b 0%, var(--bg) 55%), var(--bg);
+      color: var(--text);
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    }
+
+    .wrap {
+      width: 1200px;
+      margin: 0 auto;
+      padding: 28px 32px 64px;
+      position: relative;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      letter-spacing: 0.4px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 0 0 30px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .flow {
+      position: relative;
+      width: 100%;
+      height: 2250px;
+      border: 1px solid #173055;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #081120 0%, #060d18 100%);
+      overflow: hidden;
+    }
+
+    .node {
+      position: absolute;
+      left: 140px;
+      width: 760px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      color: #f8fbff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .node h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+
+    .node p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #e9f4ff;
+      line-height: 1.35;
+    }
+
+    .browser { background: linear-gradient(135deg, #235baf, var(--browser)); }
+    .dns { background: linear-gradient(135deg, #0b6a89, var(--dns)); }
+    .tcp { background: linear-gradient(135deg, #0f7c4a, var(--tcp)); }
+    .tls { background: linear-gradient(135deg, #9a5f05, var(--tls)); }
+    .firewall { background: linear-gradient(135deg, #9f1f1f, var(--firewall)); }
+    .lb { background: linear-gradient(135deg, #6927a2, var(--lb)); }
+    .web { background: linear-gradient(135deg, #0f8278, var(--web)); }
+    .app { background: linear-gradient(135deg, #b45309, var(--app)); }
+    .db { background: linear-gradient(135deg, #0a7f59, var(--db)); }
+
+    .legend {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      width: 245px;
+      background: rgba(7, 16, 30, 0.9);
+      border: 1px solid #244266;
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #dbe9ff;
+    }
+
+    .legend h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #9ec7ff;
+    }
+
+    .legend p {
+      margin: 6px 0;
+      font-size: 12.5px;
+      color: #c7dcf9;
+      line-height: 1.35;
+    }
+
+    svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .label {
+      fill: #d6e8ff;
+      font-size: 13px;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>What Happens When You Type https://www.google.com and Press Enter</h1>
+    <p class="subtitle">End-to-end request flow: DNS -> TCP/TLS -> Firewall -> Load Balancer -> Web/App/DB -> response to browser</p>
+
+    <div class="flow">
+      <div class="legend">
+        <h3>Flow Notes</h3>
+        <p>Solid arrows: request path going down.</p>
+        <p>Dashed arrow: response path returning up.</p>
+        <p>HTTPS is encrypted after TLS handshake and certificate validation.</p>
+      </div>
+
+      <div class="node browser" style="top: 70px;">
+        <h2>1) Browser (Client)</h2>
+        <p>User enters https://www.google.com and presses Enter.</p>
+      </div>
+
+      <div class="node dns" style="top: 220px;">
+        <h2>2) DNS Resolver</h2>
+        <p>Browser asks configured DNS resolver for www.google.com.</p>
+      </div>
+
+      <div class="node dns" style="top: 370px;">
+        <h2>3) Root DNS Servers</h2>
+        <p>Resolver queries Root to discover where .com TLD servers are.</p>
+      </div>
+
+      <div class="node dns" style="top: 520px;">
+        <h2>4) TLD DNS (.com)</h2>
+        <p>Resolver queries TLD to find Google's authoritative DNS servers.</p>
+      </div>
+
+      <div class="node dns" style="top: 670px;">
+        <h2>5) Authoritative DNS</h2>
+        <p>Authoritative server returns the IP address for www.google.com.</p>
+      </div>
+
+      <div class="node tcp" style="top: 820px;">
+        <h2>6) TCP Connection (Port 443)</h2>
+        <p>Browser establishes TCP session to returned server IP on port 443.</p>
+      </div>
+
+      <div class="node tls" style="top: 970px;">
+        <h2>7) TLS Handshake + Certificate Validation</h2>
+        <p>Browser verifies certificate; encrypted HTTPS channel is negotiated.</p>
+      </div>
+
+      <div class="node firewall" style="top: 1120px;">
+        <h2>8) Firewall</h2>
+        <p>Traffic is inspected and HTTPS on 443 is allowed to pass.</p>
+      </div>
+
+      <div class="node lb" style="top: 1270px;">
+        <h2>9) Load Balancer</h2>
+        <p>Request is routed to the least-busy healthy backend server.</p>
+      </div>
+
+      <div class="node web" style="top: 1420px;">
+        <h2>10) Web Server (Nginx/Apache)</h2>
+        <p>Serves static assets and forwards dynamic requests to app server.</p>
+      </div>
+
+      <div class="node app" style="top: 1570px;">
+        <h2>11) Application Server</h2>
+        <p>Builds dynamic response logic and requests required data.</p>
+      </div>
+
+      <div class="node db" style="top: 1720px;">
+        <h2>12) Database</h2>
+        <p>App server queries DB; DB returns records used for response rendering.</p>
+      </div>
+
+      <svg viewBox="0 0 1200 2250" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <marker id="arrowSolid" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#9fc4ff" />
+          </marker>
+          <marker id="arrowDash" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffd28a" />
+          </marker>
+        </defs>
+
+        <line x1="520" y1="160" x2="520" y2="220" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="310" x2="520" y2="370" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="460" x2="520" y2="520" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="610" x2="520" y2="670" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="760" x2="520" y2="820" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="910" x2="520" y2="970" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="1060" x2="520" y2="1120" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="1210" x2="520" y2="1270" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="1360" x2="520" y2="1420" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="1510" x2="520" y2="1570" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+        <line x1="520" y1="1660" x2="520" y2="1720" stroke="#9fc4ff" stroke-width="3" marker-end="url(#arrowSolid)" />
+
+        <path d="M 920 1780 L 1040 1780 L 1040 145 L 900 145" stroke="#ffd28a" stroke-width="3" fill="none" stroke-dasharray="10 8" marker-end="url(#arrowDash)" />
+        <text x="870" y="1808" class="label">Response data upward</text>
+        <text x="865" y="133" class="label">HTTPS response to browser</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
